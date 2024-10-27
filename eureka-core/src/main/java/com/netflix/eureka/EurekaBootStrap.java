@@ -80,6 +80,7 @@ public class EurekaBootStrap implements ServletContextListener {
 
     private static final String EUREKA_DATACENTER = "eureka.datacenter";
 
+    // 单例模式
     protected volatile EurekaServerContext serverContext;
     protected volatile AwsBinder awsBinder;
     
@@ -107,6 +108,7 @@ public class EurekaBootStrap implements ServletContextListener {
      * @see
      * javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
+    // 与org.springframework.cloud.netflix.eureka.server.EurekaServerBootstrap#contextInitialized 相同
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
@@ -124,6 +126,7 @@ public class EurekaBootStrap implements ServletContextListener {
     /**
      * Users can override to initialize the environment themselves.
      */
+    // 与org.springframework.cloud.netflix.eureka.server.EurekaServerBootstrap#initEurekaEnvironment 相同
     protected void initEurekaEnvironment() throws Exception {
         logger.info("Setting the eureka configuration..");
 
@@ -144,6 +147,7 @@ public class EurekaBootStrap implements ServletContextListener {
     /**
      * init hook for server context. Override for custom logic.
      */
+    // 与org.springframework.cloud.netflix.eureka.server.EurekaServerBootstrap#initEurekaServerContext相似
     protected void initEurekaServerContext() throws Exception {
         EurekaServerConfig eurekaServerConfig = new DefaultEurekaServerConfig();
 
