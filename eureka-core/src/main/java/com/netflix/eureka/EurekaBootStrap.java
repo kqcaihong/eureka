@@ -112,7 +112,9 @@ public class EurekaBootStrap implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
+            // 创建ConfigurationManager
             initEurekaEnvironment();
+            // 关键
             initEurekaServerContext();
 
             ServletContext sc = event.getServletContext();
@@ -149,6 +151,7 @@ public class EurekaBootStrap implements ServletContextListener {
      */
     // 与org.springframework.cloud.netflix.eureka.server.EurekaServerBootstrap#initEurekaServerContext相似
     protected void initEurekaServerContext() throws Exception {
+        // 加载eureka-server.properties
         EurekaServerConfig eurekaServerConfig = new DefaultEurekaServerConfig();
 
         // For backward compatibility
@@ -175,6 +178,7 @@ public class EurekaBootStrap implements ServletContextListener {
             applicationInfoManager = eurekaClient.getApplicationInfoManager();
         }
 
+        // 用于server间交互，做数据同步
         PeerAwareInstanceRegistry registry;
         if (isAws(applicationInfoManager.getInfo())) {
             registry = new AwsInstanceRegistry(
@@ -210,6 +214,7 @@ public class EurekaBootStrap implements ServletContextListener {
                 applicationInfoManager
         );
 
+        // 单例
         EurekaServerContextHolder.initialize(serverContext);
 
         serverContext.initialize();

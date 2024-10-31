@@ -33,6 +33,7 @@ public class EurekaServerContextHolder {
         return this.serverContext;
     }
 
+    // 单例的
     private static EurekaServerContextHolder holder;
 
     public static synchronized void initialize(EurekaServerContext serverContext) {

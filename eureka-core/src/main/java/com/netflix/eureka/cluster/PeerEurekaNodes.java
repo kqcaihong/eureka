@@ -41,7 +41,7 @@ public class PeerEurekaNodes {
     protected final EurekaClientConfig clientConfig;
     protected final ServerCodecs serverCodecs;
     private final ApplicationInfoManager applicationInfoManager;
-
+    // 其他的server节点
     private volatile List<PeerEurekaNode> peerEurekaNodes = Collections.emptyList();
     private volatile Set<String> peerEurekaNodeUrls = Collections.emptySet();
 
@@ -73,7 +73,9 @@ public class PeerEurekaNodes {
         return serverConfig.getHealthStatusMinNumberOfAvailablePeers();
     }
 
+    // eureka server节点信息维护
     public void start() {
+        // 单线程
         taskExecutor = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactory() {
                     @Override
@@ -156,9 +158,10 @@ public class PeerEurekaNodes {
             logger.warn("The replica size seems to be empty. Check the route 53 DNS Registry");
             return;
         }
-
+        // toShutdown中是过期的
         Set<String> toShutdown = new HashSet<>(peerEurekaNodeUrls);
         toShutdown.removeAll(newPeerUrls);
+        // 新增的
         Set<String> toAdd = new HashSet<>(newPeerUrls);
         toAdd.removeAll(peerEurekaNodeUrls);
 

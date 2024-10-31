@@ -294,6 +294,7 @@ public class DefaultEurekaServerConfig implements EurekaServerConfig {
 
     @Override
     public long getEvictionIntervalTimerInMs() {
+      // 配置中获取不到时，使用默认值 60秒
         return configInstance.getLongProperty(
                 namespace + "evictionIntervalTimerInMs", (60 * 1000)).get();
     }
