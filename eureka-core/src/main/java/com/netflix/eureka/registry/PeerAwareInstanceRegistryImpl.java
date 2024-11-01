@@ -92,6 +92,7 @@ import javax.inject.Singleton;
 public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry implements PeerAwareInstanceRegistry {
     private static final Logger logger = LoggerFactory.getLogger(PeerAwareInstanceRegistryImpl.class);
 
+    // 默认分区
     private static final String US_EAST_1 = "us-east-1";
     private static final int PRIME_PEER_NODES_RETRY_MS = 30000;
 
@@ -401,6 +402,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
      *            true if this is a replication event from other replica nodes,
      *            false otherwise.
      */
+    // 客户端注册时，isReplication为false；eureka集群间同步注册信息时，isReplication为true
     @Override
     public void register(final InstanceInfo info, final boolean isReplication) {
         int leaseDuration = Lease.DEFAULT_DURATION_IN_SECS;
@@ -408,6 +410,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
             leaseDuration = info.getLeaseInfo().getDurationInSecs();
         }
         super.register(info, leaseDuration, isReplication);
+        // eureka集群同步
         replicateToPeers(Action.Register, info.getAppName(), info.getId(), info, null, isReplication);
     }
 
