@@ -205,6 +205,7 @@ public class DefaultEurekaServerConfig implements EurekaServerConfig {
      */
     @Override
     public int getPeerEurekaNodesUpdateIntervalMs() {
+        // 10分钟
         return configInstance
                 .getIntProperty(namespace + "peerEurekaNodesUpdateIntervalMs",
                         (10 * 60 * 1000)).get();
