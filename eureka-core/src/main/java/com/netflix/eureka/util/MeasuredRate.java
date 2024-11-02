@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Karthik Ranganathan,Greg Kim
  */
+// 实用程序类，用于获取最近X毫秒内的计数。
 public class MeasuredRate {
     private static final Logger logger = LoggerFactory.getLogger(MeasuredRate.class);
     private final AtomicLong lastBucket = new AtomicLong(0);
