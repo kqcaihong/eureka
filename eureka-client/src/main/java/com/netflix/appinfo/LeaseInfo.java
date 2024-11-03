@@ -37,11 +37,14 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 @JsonRootName("leaseInfo")
 public class LeaseInfo {
 
+    // 默认续期间隔
     public static final int DEFAULT_LEASE_RENEWAL_INTERVAL = 30;
+    // 默认租期
     public static final int DEFAULT_LEASE_DURATION = 90;
 
     // Client settings
     private int renewalIntervalInSecs = DEFAULT_LEASE_RENEWAL_INTERVAL;
+    // 租期
     private int durationInSecs = DEFAULT_LEASE_DURATION;
 
     // Server populated
