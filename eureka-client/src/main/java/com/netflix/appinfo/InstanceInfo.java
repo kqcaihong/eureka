@@ -86,18 +86,19 @@ public class InstanceInfo {
     public static final int DEFAULT_COUNTRY_ID = 1; // US
 
     // The (fixed) instanceId for this instanceInfo. This should be unique within the scope of the appName.
+    // 在某个Application下唯一
     private volatile String instanceId;
-
+    // 所属的Application
     private volatile String appName;
     @Auto
     private volatile String appGroupName;
-
+    // 网络地址
     private volatile String ipAddr;
 
     private static final String SID_DEFAULT = "na";
     @Deprecated
     private volatile String sid = SID_DEFAULT;
-
+    // 端口
     private volatile int port = DEFAULT_PORT;
     private volatile int securePort = DEFAULT_SECURE_PORT;
 
@@ -135,6 +136,7 @@ public class InstanceInfo {
     private volatile String hostName;
     private volatile InstanceStatus status = InstanceStatus.UP;
     private volatile InstanceStatus overriddenstatus = InstanceStatus.UNKNOWN;
+    // 用于节点信息同步
     @XStreamOmitField
     private volatile boolean isInstanceInfoDirty = false;
     private volatile LeaseInfo leaseInfo;
@@ -144,6 +146,7 @@ public class InstanceInfo {
     private volatile Map<String, String> metadata = new ConcurrentHashMap<String, String>();
     @Auto
     private volatile Long lastUpdatedTimestamp = System.currentTimeMillis();
+    // 上次节点信息变动时间戳
     @Auto
     private volatile Long lastDirtyTimestamp = System.currentTimeMillis();
     @Auto
@@ -325,6 +328,7 @@ public class InstanceInfo {
         return result;
     }
 
+    // 根据id判断
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -1309,8 +1313,7 @@ public class InstanceInfo {
     public enum ActionType {
         ADDED, // Added in the discovery server
         MODIFIED, // Changed in the discovery server
-        DELETED
-        // Deleted from the discovery server
+        DELETED// Deleted from the discovery server
     }
 
     /**

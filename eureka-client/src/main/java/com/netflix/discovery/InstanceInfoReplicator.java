@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  *   @author dliu
  */
+// 向eureka同步节点信息的更新
 class InstanceInfoReplicator implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(InstanceInfoReplicator.class);
 
@@ -61,6 +62,7 @@ class InstanceInfoReplicator implements Runnable {
 
     public void start(int initialDelayMs) {
         if (started.compareAndSet(false, true)) {
+            // 设置isInstanceInfoDirty为true，将在下一次心跳时将实例信息传送到eureka
             instanceInfo.setIsDirty();  // for initial register
             Future next = scheduler.schedule(this, initialDelayMs, TimeUnit.SECONDS);
             scheduledPeriodicRef.set(next);
@@ -72,6 +74,7 @@ class InstanceInfoReplicator implements Runnable {
         started.set(false);
     }
 
+    // 节点变为down时，立即同步给eureka
     public boolean onDemandUpdate() {
         if (rateLimiter.acquire(burstSize, allowedRatePerMinute)) {
             if (!scheduler.isShutdown()) {
@@ -105,13 +108,16 @@ class InstanceInfoReplicator implements Runnable {
             discoveryClient.refreshInstanceInfo();
 
             Long dirtyTimestamp = instanceInfo.isDirtyWithTime();
+            // 节点信息发生变化
             if (dirtyTimestamp != null) {
+                // 重新注册
                 discoveryClient.register();
                 instanceInfo.unsetIsDirty(dirtyTimestamp);
             }
         } catch (Throwable t) {
             logger.warn("There was a problem with the instance info replicator", t);
         } finally {
+            // 创建下一次任务
             Future next = scheduler.schedule(this, replicationIntervalSeconds, TimeUnit.SECONDS);
             scheduledPeriodicRef.set(next);
         }
