@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tomasz Bak
  */
+// 相邻eureka实例
 @Singleton
 public class PeerEurekaNodes {
 
@@ -41,7 +42,8 @@ public class PeerEurekaNodes {
     protected final EurekaClientConfig clientConfig;
     protected final ServerCodecs serverCodecs;
     private final ApplicationInfoManager applicationInfoManager;
-    // 其他的server节点
+
+    // 由线程池周期更新，默认10分钟
     private volatile List<PeerEurekaNode> peerEurekaNodes = Collections.emptyList();
     private volatile Set<String> peerEurekaNodeUrls = Collections.emptySet();
 
@@ -87,6 +89,7 @@ public class PeerEurekaNodes {
                 }
         );
         try {
+            // 立即执行一次
             updatePeerEurekaNodes(resolvePeerUrls());
             Runnable peersUpdateTask = new Runnable() {
                 @Override
@@ -99,6 +102,7 @@ public class PeerEurekaNodes {
 
                 }
             };
+            // 周期更新
             taskExecutor.scheduleWithFixedDelay(
                     peersUpdateTask,
                     serverConfig.getPeerEurekaNodesUpdateIntervalMs(),
@@ -132,12 +136,15 @@ public class PeerEurekaNodes {
      */
     protected List<String> resolvePeerUrls() {
         InstanceInfo myInfo = applicationInfoManager.getInfo();
+        // 默认为"us-east-1"
         String zone = InstanceInfo.getZone(clientConfig.getAvailabilityZones(clientConfig.getRegion()), myInfo);
+        // 所有eureka server的url
         List<String> replicaUrls = EndpointUtils
                 .getDiscoveryServiceUrls(clientConfig, zone, new EndpointUtils.InstanceInfoBasedUrlRandomizer(myInfo));
 
         int idx = 0;
         while (idx < replicaUrls.size()) {
+            // 去掉自己
             if (isThisMyUrl(replicaUrls.get(idx))) {
                 replicaUrls.remove(idx);
             } else {
@@ -158,7 +165,8 @@ public class PeerEurekaNodes {
             logger.warn("The replica size seems to be empty. Check the route 53 DNS Registry");
             return;
         }
-        // toShutdown中是过期的
+
+        // 下线的
         Set<String> toShutdown = new HashSet<>(peerEurekaNodeUrls);
         toShutdown.removeAll(newPeerUrls);
         // 新增的

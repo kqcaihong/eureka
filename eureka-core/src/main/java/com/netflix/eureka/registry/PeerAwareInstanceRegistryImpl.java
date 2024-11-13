@@ -150,8 +150,9 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     public void init(PeerEurekaNodes peerEurekaNodes) throws Exception {
         this.numberOfReplicationsLastMin.start();
         this.peerEurekaNodes = peerEurekaNodes;
+        // 创建注册表缓存
         initializedResponseCache();
-        // 启动Timer
+        // 启动自我保护任务
         scheduleRenewalThresholdUpdateTask();
         initRemoteRegionRegistry();
 
@@ -189,6 +190,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
      * many instances at a time.
      *
      */
+    // 定时更新阈值的任务。续订阈值将用于确定续订是否由于网络分区而急剧下降，并保护一次过期的实例太多
     private void scheduleRenewalThresholdUpdateTask() {
         timer.schedule(new TimerTask() {
                            @Override
@@ -204,6 +206,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
      * operation fails over to other nodes until the list is exhausted if the
      * communication fails.
      */
+    // 填充来自对等eureka节点的注册表信息。如果通信失败，此操作将切换到其他节点，直到列表耗尽。
     @Override
     public int syncUp() {
         // Copy entire entry from neighboring DS node
@@ -218,11 +221,14 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
                     break;
                 }
             }
+            // 从其他节点获取注册表
             Applications apps = eurekaClient.getApplications();
             for (Application app : apps.getRegisteredApplications()) {
                 for (InstanceInfo instance : app.getInstances()) {
                     try {
+                        // region检查
                         if (isRegisterable(instance)) {
+                            // 添加到本地注册表
                             register(instance, instance.getLeaseInfo().getDurationInSecs(), true);
                             count++;
                         }
@@ -522,6 +528,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
      * {@link EurekaServerConfig#getRenewalPercentThreshold()} of renewals
      * received per minute {@link #getNumOfRenewsInLastMin()}.
      */
+    // 根据当前的续订次数更新续订阈值。阈值是在EurekaServerConfig.getRenewalPercentThreshold（）中指定的每分钟收到的更新的百分比
     private void updateRenewalThreshold() {
         try {
             Applications apps = eurekaClient.getApplications();

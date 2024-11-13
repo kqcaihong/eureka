@@ -53,6 +53,7 @@ public abstract class AbstractJerseyEurekaHttpClient implements EurekaHttpClient
                     .header("Accept-Encoding", "gzip")
                     .type(MediaType.APPLICATION_JSON_TYPE)
                     .accept(MediaType.APPLICATION_JSON)
+                // 请求体就是InstanceInfo
                     .post(ClientResponse.class, info);
             return anEurekaHttpResponse(response.getStatus()).headers(headersOf(response)).build();
         } finally {

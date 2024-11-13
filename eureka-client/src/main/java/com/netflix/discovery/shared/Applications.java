@@ -74,7 +74,7 @@ public class Applications {
 
     @XStreamImplicit
     private AbstractQueue<Application> applications;
-
+    // 注册表，key appName
     private Map<String, Application> appNameApplicationMap = new ConcurrentHashMap<String, Application>();
     private Map<String, AbstractQueue<InstanceInfo>> virtualHostNameAppMap = new ConcurrentHashMap<String, AbstractQueue<InstanceInfo>>();
     private Map<String, AbstractQueue<InstanceInfo>> secureVirtualHostNameAppMap = new ConcurrentHashMap<String, AbstractQueue<InstanceInfo>>();
@@ -433,6 +433,7 @@ public class Applications {
                                   @Nullable InstanceRegionChecker instanceRegionChecker) {
         this.virtualHostNameAppMap.clear();
         this.secureVirtualHostNameAppMap.clear();
+        // 处理每一个Application
         for (Application application : appNameApplicationMap.values()) {
             if (indexByRemoteRegions) {
                 application.shuffleAndStoreInstances(remoteRegionsRegistry, clientConfig, instanceRegionChecker);
