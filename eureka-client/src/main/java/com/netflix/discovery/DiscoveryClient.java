@@ -380,6 +380,7 @@ public class DiscoveryClient implements EurekaClient {
                             .build());
 
             heartbeatExecutor = new ThreadPoolExecutor(
+                // 默认最大线程数为5
                     1, clientConfig.getHeartbeatExecutorThreadPoolSize(), 0, TimeUnit.SECONDS,
                     new SynchronousQueue<Runnable>(),
                     new ThreadFactoryBuilder()
@@ -829,14 +830,15 @@ public class DiscoveryClient implements EurekaClient {
     boolean renew() {
         EurekaHttpResponse<InstanceInfo> httpResponse;
         try {
+            // 用JerseyReplicationClient发送http请求
             httpResponse = eurekaTransport.registrationClient.sendHeartBeat(instanceInfo.getAppName(), instanceInfo.getId(), instanceInfo, null);
             logger.debug("{} - Heartbeat status: {}", PREFIX + appPathIdentifier, httpResponse.getStatusCode());
-            // 尚未注册
+            // 尚未向eureka注册
             if (httpResponse.getStatusCode() == 404) {
                 REREGISTER_COUNTER.increment();
                 logger.info("{} - Re-registering apps/{}", PREFIX + appPathIdentifier, instanceInfo.getAppName());
                 long timestamp = instanceInfo.setIsDirtyWithTime();
-                // 注册
+                // 发起注册
                 boolean success = register();
                 if (success) {
                     instanceInfo.unsetIsDirty(timestamp);
@@ -906,6 +908,7 @@ public class DiscoveryClient implements EurekaClient {
         if(eurekaTransport != null && eurekaTransport.registrationClient != null) {
             try {
                 logger.info("Unregistering ...");
+                // 入参是appName、instanceId
                 EurekaHttpResponse<Void> httpResponse = eurekaTransport.registrationClient.cancel(instanceInfo.getAppName(), instanceInfo.getId());
                 logger.info(PREFIX + appPathIdentifier + " - deregister  status: " + httpResponse.getStatusCode());
             } catch (Exception e) {
@@ -1408,6 +1411,7 @@ public class DiscoveryClient implements EurekaClient {
     /**
      * The heartbeat task that renews the lease in the given intervals.
      */
+    // 在给定的时间间隔内更新租约的心跳任务。
     private class HeartbeatThread implements Runnable {
 
         public void run() {

@@ -69,7 +69,7 @@ public class Application {
     private final Set<InstanceInfo> instances;
 
     private AtomicReference<List<InstanceInfo>> shuffledInstances = new AtomicReference<List<InstanceInfo>>();
-
+    // key是instanceId
     private Map<String, InstanceInfo> instancesMap;
 
     public Application() {

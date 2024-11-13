@@ -136,7 +136,7 @@ public class InstanceInfo {
     private volatile String hostName;
     private volatile InstanceStatus status = InstanceStatus.UP;
     private volatile InstanceStatus overriddenstatus = InstanceStatus.UNKNOWN;
-    // 用于节点信息同步
+    // 最新节点信息是否已同步给Eureka
     @XStreamOmitField
     private volatile boolean isInstanceInfoDirty = false;
     private volatile LeaseInfo leaseInfo;
@@ -911,6 +911,7 @@ public class InstanceInfo {
      */
     @JsonIgnore
     public String getId() {
+        // 优先用instanceId
         if (instanceId != null && !instanceId.isEmpty()) {
             return instanceId;
         } else if (dataCenterInfo instanceof UniqueIdentifier) {
@@ -919,6 +920,7 @@ public class InstanceInfo {
                 return uniqueId;
             }
         }
+        // 最后用主机名
         return hostName;
     }
 
